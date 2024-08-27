@@ -14,6 +14,15 @@ class Product extends Model
         'description',
         'price',
     ];
+
+    //getImageProducts
+    function imageUrl()
+    {
+        return $this->image
+            ? asset('storage/' . $this->image)
+            : 'https://www.plas-pak.com/wp-content/themes/plaspak/img/product-placeholder.gif';
+    }
+
     /**
      * Get the category that owns the Product
      *

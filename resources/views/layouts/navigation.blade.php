@@ -13,21 +13,23 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('dash.Dashboard') }}
+                        {{-- {{ __('test') }} json test --}}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories')">
-                        {{ __('categories') }}
+                        {{ __('category.categories') }}
                     </x-nav-link>
                 </div>
                 @role('seller|admin')
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link :href="route('product.index')" :active="request()->routeIs('product')">
-                            {{ __('product') }}
+                            {{ __('category.product') }}
                         </x-nav-link>
                     </div>
                 @endrole
+
             </div>
 
             <!-- Settings Dropdown -->
@@ -63,6 +65,16 @@
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
+                            <div class="">
+
+                                <x-dropdown-link :href="url('site/en')" :active="request()->routeIs('English')">
+                                    {{ 'English' }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="url('site/si')" :active="request()->routeIs('Sinhala')">
+                                    {{ 'Sinhala' }}
+                                </x-dropdown-link>
+
+                            </div>
                         </form>
                     </x-slot>
                 </x-dropdown>

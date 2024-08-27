@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-1 rounded sm:rounded-sm">
         <div class="max-w-full mx-auto space-y-6 sm:px-6 lg:px-8">
             <div class="p-4 bg-white shadow sm:p-8 sm:rounded-lg">
                 <div class="w-full">
@@ -14,13 +14,17 @@
                             <h1 class="text-base font-semibold leading-6 text-gray-900">{{ __('products') }}</h1>
                             <p class="mt-2 text-sm text-gray-700">A list of all the {{ __('products') }}.</p>
                         </div>
-                        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex">
                             <a type="button" href="{{ route('product.create') }}"
-                                class="block px-3 py-2 text-sm font-semibold text-center text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add
+                                class="block px-3 py-2 mx-1 text-sm font-semibold text-center text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-1">Add
                                 new</a>
+                            @role('admin')
+                                <a type="button" href="{{ route('products.export') }}"
+                                    class="block px-3 py-2 text-sm font-semibold text-center text-white bg-blue-700 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-1 mx-1">
+                                    Export</a>
+                            @endrole
                         </div>
                     </div>
-
                     @if (session('success'))
                         <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 border border-green-200 rounded-lg">
                             {{ session('success') }}
@@ -42,6 +46,9 @@
                                             <th scope="col"
                                                 class="py-3 pl-4 pr-3 text-xs font-semibold tracking-wide text-left text-gray-500 uppercase">
                                                 Category</th>
+                                            <th scope="col"
+                                                class="py-3 pl-4 pr-3 text-xs font-semibold tracking-wide text-left text-gray-500 uppercase">
+                                                Image</th>
                                             @role('admin')
                                                 <th scope="col"
                                                     class="py-3 pl-4 pr-3 text-xs font-semibold tracking-wide text-left text-gray-500 uppercase">
@@ -69,14 +76,19 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach ($products as $product)
-                                            <tr class="even:bg-gray-50">
+                                            <tr class="bg-gray-50 border-none my-1">
+
                                                 <td
                                                     class="py-4 pl-4 pr-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
                                                     {{ $product->category->name }}</td>
+                                                <td class="w-5">
+                                                    <img src="{{ $product->imageUrl() }}" alt="">
+                                                </td>
                                                 @role('admin')
                                                     <td
                                                         class="py-4 pl-4 pr-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
-                                                        {{ $product->seller->name }}</td>
+                                                        {{ $product->seller->name }}
+                                                    </td>
                                                 @endrole
 
                                                 <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
@@ -89,18 +101,18 @@
                                                     {{ $product->qty }}</td>
 
                                                 <td
-                                                    class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                                    <form action="{{ route('product.destroy', $product->id) }}"
+                                                    class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap flex">
+                                                    <a href="{{ route('product.show', Crypt::encrypt($product->id)) }}"
+                                                        class="mr-2 font-bold text-gray-600 hover:text-gray-900">{{ __('Show') }}</a>
+                                                    <a href="{{ route('product.edit', Crypt::encrypt($product->id)) }}"
+                                                        class="mr-2 font-bold text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
+                                                    <form
+                                                        action="{{ route('product.destroy', Crypt::encrypt($product->id)) }}"
                                                         method="POST">
-                                                        <a href="{{ route('product.show', $product->id) }}"
-                                                            class="mr-2 font-bold text-gray-600 hover:text-gray-900">{{ __('Show') }}</a>
-                                                        <a href="{{ route('product.edit', $product->id) }}"
-                                                            class="mr-2 font-bold text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
                                                         @csrf
                                                         @method('DELETE')
-                                                        <a href="{{ route('product.destroy', $product->id) }}"
-                                                            class="font-bold text-red-600 hover:text-red-900"
-                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;">{{ __('Delete') }}</a>
+                                                        <button class="font-bold text-red-600 hover:text-red-900"
+                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;">{{ __('Delete') }}</button>
                                                     </form>
                                                 </td>
                                             </tr>

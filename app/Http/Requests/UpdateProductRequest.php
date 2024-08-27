@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\UpperCase;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRequest extends FormRequest
@@ -22,9 +23,9 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'nullable|numeric',
+            'name' => ['required', 'string', 'max:255', new UpperCase()],
+            'description' => 'required|string',
+            'price' => 'required|numeric',
         ];
     }
 }

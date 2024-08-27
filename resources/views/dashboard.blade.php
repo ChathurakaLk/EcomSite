@@ -1,10 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            {{ __('Dashboard') }}
+            {{ __('dash.Dashboard') }}
+
         </h2>
     </x-slot>
+    <div class="max-w-96 flex justify-center">
+        @if (session('success'))
+            <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 border border-green-200 rounded-lg">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg">
+                {{ session('error') }}
+            </div>
+        @endif
+    </div>
     <div class="flex pt-12">
+
         @if (Auth::User()->hasRole('admin|seller|buyer'))
             <div class="w-full mx-auto max-w-7xl sm:px-6 lg:px-3">
                 <div class="overflow-hidden bg-red-300 shadow-sm sm:rounded-lg">

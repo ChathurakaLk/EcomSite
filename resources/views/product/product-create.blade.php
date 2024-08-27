@@ -23,7 +23,8 @@
                     <div class="flow-root">
                         <div class="mt-8 overflow-x-auto">
                             <div class="max-w-xl py-2 align-middle">
-                                <form method="POST" action="{{ route('product.store') }}">
+                                <form method="POST" action="{{ route('product.store') }}"
+                                    enctype="multipart/form-data">
                                     @csrf
                                     <div class="space-y-6">
 
@@ -33,7 +34,7 @@
                                                 class="block w-full mt-1 'border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm'">
                                                 <option value="">Select Category</option>
                                                 @foreach ($categories as $key => $category)
-                                                    <option value="{{$key}}">{{ $category }}</option>
+                                                    <option value="{{ $key }}">{{ $category }}</option>
                                                 @endforeach
                                             </select>
                                             <x-input-error class="mt-2" :messages="$errors->get('category_id')" />
@@ -65,6 +66,12 @@
                                                 class="block w-full mt-1" :value="old('qty', $product?->qty)" autocomplete="qty"
                                                 placeholder="qty" />
                                             <x-input-error class="mt-2" :messages="$errors->get('qty')" />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="image" :value="__('Image')" />
+                                            <x-text-input id="image" name="image" type="file"
+                                                class="block w-full mt-1" />
+                                            <x-input-error class="mt-2" :messages="$errors->get('image')" />
                                         </div>
 
                                         <div class="flex items-center gap-4">

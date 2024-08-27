@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\category;
-use App\Models\Product;
+use App\Exports\ProductExport;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Models\category;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -28,6 +32,7 @@ class ProductController extends Controller
      */
     public function create()
     {
+
         $product = new Product();
         $categories =Category::all()->pluck('name', 'id');
         return view('product.product-create', compact('product', 'categories'));
@@ -46,7 +51,12 @@ class ProductController extends Controller
         $product -> description = $request-> description;
         $product -> price       = $request-> price;
         $product -> qty         = $request-> qty;
-        $product -> image       = $request-> image;
+
+        $path=null;
+        if($request->file('image')){
+            $path = $request->file('image')->store('products');
+        }
+        $product -> image       = $path;
         $product -> save();
         return redirect()->route('product.index');
     }
@@ -54,50 +64,67 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show($product)
     {
-        if($product->seller_id === Auth::id()){
-            return view('product.show', compact('product'));
-        }else{
-            abort(403);
-        }
+        $productId = Crypt::decrypt($product);
+        $product = Product::find($productId );
+            if($product->seller_id == Auth::id() || Auth::user()->hasRole('admin')){
+                return view('product.show', compact('product'));
+            }else{
+                abort(403);
+            }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit($product)
     {
-        if($product->seller_id === Auth::id()){
-            return view('product.edit', compact('product'));
-        }else{
-            abort(403);
-        }
+         $productId = Crypt::decrypt($product);
+         $product = Product::find($productId );
+            if($product->seller_id == Auth::id() || Auth::user()->hasRole('admin')){
+                return view('product.edit', compact('product'));
+            }else{
+                abort(403);
+            }
     }
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, $product)
     {
-        if($product->seller_id === Auth::id()){
-            $product->update($request->validated());
-            return redirect()->route('product.index')->with('success', 'Product updated successfully');
-        }else{
-            abort(403);
-        }
+         $productId = Crypt::decrypt($product);
+         $product = Product::find($productId );
+            if($product->seller_id == Auth::id() || Auth::user()->hasRole('admin')){
+                $product->update($request->validated());
+                return redirect()->route('product.index')->with('success', 'Product updated successfully');
+            }else{
+                abort(403);
+            }
 
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($product)
     {
-        if($product->seller_id === Auth::id()){
-            $product->delete();
-            return redirect()->route('product.index')->with('success', 'Product deleted successfully');
-        }else{
-            abort(403);
-        }
+            $productId = Crypt::decrypt($product);
+            $product = Product::find($productId );
+            if($product->seller_id == Auth::id() || Auth::user()->hasRole('admin')){
+                $product->delete();
+                if(isset($product->image)){
+                    Storage::delete($product->image);
+                }
+                return redirect()->route('product.index')->with('success', 'Product deleted successfully');
+            }else{
+                abort(403);
+            }
+    }
+
+    //export products
+    public function export()
+    {
+        return Excel::download(new ProductExport, 'Products.xlsx');
     }
 }
